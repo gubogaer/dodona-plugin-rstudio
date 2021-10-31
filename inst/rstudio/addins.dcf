@@ -1,0 +1,29 @@
+Name: ⌂ home
+Description: open dodona plugin
+Binding: start_exercising
+Interactive: false
+
+Name: submit
+Description: open dodona plugin
+Binding: submit
+Interactive: false
+
+Name: submit selected
+Description: open dodona plugin
+Binding: submit_selected
+Interactive: false
+
+Name: -> next exercise
+Description: open dodona plugin
+Binding: get_next_exercise
+Interactive: false
+
+Name: <- previous exercise
+Description: open dodona plugin
+Binding: get_previous_exercise
+Interactive: false
+
+Name: exercise picker
+Description: open dodona plugin
+Binding: start_exercise_picker
+Interactive: false
