@@ -1,0 +1,30 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="./app.js"></script>
+        <script src="./tabs.js"></script>
+        <title>Document</title>
+        <link rel="stylesheet" href="./style.css">
+        <link rel="stylesheet" href="./lib/highlight_Vs.css">
+        <script src="./lib/highlight.min.js"></script>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" media="all" href="https://dodona.ugent.be/assets/application-7a8bece9578bc7a116704c6b0c16fc4b2e56c6b0dcb02faece8b98f3cb0629b8.css">
+    </head>
+    <body>
+        <script>
+            document.body.appendChild(dodona_lite({"description":["<!DOCTYPE html>\n<html\n  prefix=\"og: http://ogp.me/ns#\"\n  lang=\"nl\"\n  class=\"dodona-frame\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  \n  <meta property=\"og:image\" content=\"https://dodona.ugent.be/icon.png\">\n  <link href=\"https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap\" rel=\"stylesheet\">\n  <link href=\"https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css\" rel=\"stylesheet\" type='text/css'>\n    <link rel=\"stylesheet\" media=\"all\" href=\"https://dodona.ugent.be/assets/application-7a8bece9578bc7a116704c6b0c16fc4b2e56c6b0dcb02faece8b98f3cb0629b8.css\" />\n  <script src=\"https://dodona.ugent.be/packs/js/frame-4b29eb691fe07eb4d3e5.js\"><\/script>\n  <script src=\"https://dodona.ugent.be/assets/application-e7b84bf1248e729274bff4ce2f609f5247236d52809c175d0b2290655094c941.js\"><\/script>\n    <script src=\"https://dodona.ugent.be/packs/js/description-724d114b75652d3df622.js\"><\/script>\n  <script>\n    window.dodona.initMathJax();\n  <\/script>\n  <script id=\"MathJax-script\" src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'><\/script>\n\n<\/head>\n<body>\n<base target=\"_parent\" href=\"https://sandbox.dodona.be/nl/activities/653660595/description/wZ5J5pg-hCYMpe97/?dark=false\">\n  <div class=\"activity-description\">\n  <div class=\"card-supporting-text\">\n      <p>When working with a new dataframe it is important to get an overview of the given data before diving into the project.\nThe following functions can be used for exploring dataframes. find out what they do and how they can be used.<\/p>\n\n<ul>\n  <li>names<\/li>\n  <li>head<\/li>\n  <li>str<\/li>\n  <li>summary<\/li>\n<\/ul>\n\n<blockquote class=\"callout callout-info\">\n  <h4 id=\"getting-help-with-r\">Getting Help with R<\/h4>\n  <p>R includes extensive facilities for accessing <strong>documentation<\/strong> and searching for help. Ofcourse you could also use a general <strong>internet<\/strong> search engine.<\/p>\n  <h5 id=\"help-and-\"><code>help()<\/code> and <code>?<\/code><\/h5>\n  <p>The <code>help()<\/code> function and <code>?<\/code> help operator in R provide access to the documentation pages for R functions, data sets, and other objects, both for packages in the standard R distribution and for intalled packages. To access documentation for the standard <code>str<\/code> function, for example, enter the command <code>help(str)<\/code> or <code>help(\"str\")<\/code>, or <code>?str<\/code> or <code>?\"+\"<\/code> (i.e., the quotes are optional).<\/p>\n<\/blockquote>\n\n<h3 id=\"exercise\">Exercise<\/h3>\n<p>We have loaded in the dataframe <code>murders<\/code> for you. Enter the commands at the correct position.<\/p>\n\n<ol>\n  <li>\n    <p>You want to see all column names of the dataframe. Store your result in an object named <code>question1<\/code>.<\/p>\n  <\/li>\n  <li>\n    <p>You want to see the <strong>first 10<\/strong> rows of the dataframe. Store your result in an object named <code>question2<\/code>.<\/p>\n  <\/li>\n  <li>\n    <p>You want to see a technical overview of the dataframe object, revealing the internal object structure. Store your result in an object named <code>question3<\/code>.<\/p>\n  <\/li>\n  <li>\n    <p>You want a columnwise summary of all the data in the dataframe. Store your result in an object named <code>question4<\/code>.<\/p>\n  <\/li>\n<\/ol>\n\n    <footer class=\"footnote-links visible-print\">\n    <\/footer>\n  <\/div>\n<\/div>\n<script>\n  $(() => window.dodona.initDescription());\n<\/script>\n\n<\/body>\n<\/html>\n"],"code":["#https://dodona.ugent.be/nl/courses/705/series/8643/activities/653660595.json\n\n### loading data ###\nlibrary(dslabs)\ndata(murders)\n\n### question 1 ###\nlalalacode\n\n### question 2 ###\n# place your code here\n\n### question 3 ###\n# place your code here\n\n### question 4 ###\n# place your code here\ngsub(\"^https://.*/activities/(\\\\d+).*$\", \"\\\\1\", \"https://dodona.ugent.be/nl/courses/705/series/8643/activities/653660595.json\")\n\n\"\\\"### \\\\\\\"ik ben ###een sting\\\\\\\"\\\"\"\n\n\"ik ben een ### resr\""],"feedback_names":[["eval"]],"feedback_content":[["<div class=\"tab-pane feedback-tab-pane active\" id=\"tab-eval-0\"><div class=\"groups\"><div class=\"group wrong\"><div class=\"messages\"><div class=\"message message-student\" title=\"\">Error while evaluating context: object 'lalalacode' not found<\/div><\/div><\/div><\/div><\/div>\n"]]}).content.cloneNode(true));
+
+            init_tabs();
+            hljs.configure({languages: ["r"]});
+            hljs.initHighlightingOnLoad();
+
+            console.log(document.querySelector("#exercise_tabs"));
+            setTab(document.querySelector("#exercise_tabs"), 1)
+            setTab(document.querySelector("#feedback_tabs"), 0)
+        </script>
+    </body>
+    </html>

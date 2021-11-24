@@ -1,1 +1,10 @@
 exportPattern("^[[:alpha:]]+")
+
+import(jsonlite)
+import(miniUI)
+import(dplyr)
+import(shiny)
+import(rvest)
+import(xml2)
+import(shinyWidgets)
+import(servr)

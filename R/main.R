@@ -1,3 +1,33 @@
+source("R/exercise_picker.R")
+source("R/exercise_viewer.R")
+
+
+exercise_picker <- function(){
+
+  #testje()
+  a <- start_exercise_picker()
+  open_exercise(a)
+  # print(a)
+}
+
+submit_exercise <- function(){
+  exercise_path <- rstudioapi::getSourceEditorContext()$path
+
+  con <- file(exercise_path,"r")
+  lines <- readLines(con)
+  close(con)
+  exercise_url <- gsub("^.*#.*(https://dodona.ugent.be[^ ]*).*$", "\\1", lines[1])
+
+  print("test1")
+  submission_url <- submit_code(paste0(lines, collapse="\n"), exercise_url)
+  print("test2")
+  submission_json <- wait_for_feedback(submission_url)
+  print("test3")
+  get_index_content(exercise_url, submission_json$url)
+  refresh_viewer()
+
+}
+
 
 
 testAddin <- function() {
@@ -57,7 +87,7 @@ testAddin <- function() {
 
   parsed_DOM <- read_html(submission_raw)
   print("stap1.5 succeeded")
-  submission_div <- parsed_DOM %>% html_nodes("[class='card-supporting-text']")
+  submission_div <- parsed_DOM %>% html_nodes(".card-supporting-text")
   print("midden")
   submission_head <- parsed_DOM %>% html_nodes("head")
   print("stap2 succeeded")
@@ -90,11 +120,14 @@ start_exercising <- function(){
 }
 
 
+
 addin <- function(){
   library(jsonlite)
   library(miniUI)
   library(dplyr)
   library(shiny)
+
+  print("addin called")
 
   courses <- get_json("https://dodona.ugent.be/nl/")$user$subscribed_courses
   courses <- lapply(courses %>% select(year, name, series) %>% group_by(year) %>% split(courses$year), function(x){lapply(x %>% group_by(name) %>% split(x$name), function(y){y$series})})
@@ -274,71 +307,6 @@ login <- function(callback = function(){}){
 }
 
 
-generate_exercise_header <- function(exercise, last_sumission){
-  return(
-    paste0("<style>
-      .tab {
-        overflow: hidden;
-        background-color: #1976d2;
-        height: 60px;
-      }
-
-      .tab button {
-        background-color: inherit;
-        border: none;
-        outline: none;
-        cursor: pointer;
-        padding: 14px 16px;
-        transition: 0.3s;
-        font-size: 17px;
-        color: white;
-      }
-
-      .tab button:hover {
-        background-color: #1660a9;
-      }
-
-      .tab button.active {
-        background-color: #1660a9;
-      }
-
-      .tabcontent {
-        display: none;
-      }
-    </style>
-    <script>
-    function openTabi(evt, cityName) {
-      var i, tabcontent, tablinks;
-      tabcontent = document.getElementsByClassName('tabcontent');
-      for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = 'none';
-      }
-      tablinks = document.getElementsByClassName('tablinks');
-      for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(' active', '');
-      }
-      document.getElementById(cityName).style.display = 'block';
-      evt.currentTarget.className += ' active';
-    }
-    </script>
-
-
-    <div class='tab'>
-      <button class='tablinks active' onclick=\"openTabi(event, 'last_submission')\">Last Submission</button>
-      <button class='tablinks' onclick=\"openTabi(event, 'current_exercise')\">Exercise</button>
-    </div>
-
-    <div id='last_submission' class='tabcontent' style='display:block'>",
-           exercise,
-           "</div>
-
-    <div id='current_exercise' class='tabcontent'>",
-           last_sumission,
-           "</div>
-
-    ")
-  )
-}
 
 
 
