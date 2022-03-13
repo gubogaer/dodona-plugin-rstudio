@@ -1,7 +1,7 @@
 
 #user specified data
 language <- "nl"
-api_token <- "wtFi6Xvj2zby-jdnIco4XajTcsb8g02zSzLbzyaKTqg"
+api_token <- "gkMKIpu3ZibTNU8nXsgTidQFp-ECG_XxkZWyvcsrpS8"
 
 #constants
 base_url <- "https://dodona.ugent.be/"
@@ -19,7 +19,7 @@ get_html <- function(url){
              'Accept' = 'text/html',
              'Authorization' = api_token
            ))
-  httr::content(response, type="text")
+  httr::content(response, type="text", encoding = "UTF-8")
 }
 
 get_json <- function(url){
@@ -29,7 +29,7 @@ get_json <- function(url){
                            'Accept' = 'application/json',
                            'Authorization' = api_token
                          ))
-  jsonlite::fromJSON(httr::content(home_json, type="text"))
+  jsonlite::fromJSON(httr::content(home_json, type="text", encoding = "UTF-8"))
 }
 
 get_home <- function(){
@@ -37,7 +37,7 @@ get_home <- function(){
 }
 
 post_json <- function(url, body){
-  post_reply <- httr::POST(
+  resp <- httr::POST(
      url,
      config = httr::add_headers(
          'Authorization' = api_token,
@@ -46,5 +46,19 @@ post_json <- function(url, body){
      ),
      body = body
   )
-  jsonlite::fromJSON(httr::content(post_reply, type="text"))
+
+  parsed <- jsonlite::fromJSON(httr::content(resp, type="text", encoding = "UTF-8"))
+
+  if (httr::status_code(resp) != 200) {
+    stop(
+      sprintf(
+        "API request failed [%s]\n%s\n<>",
+        httr::status_code(resp),
+        parsed
+      ),
+      call. = FALSE
+    )
+  }
+
+  return(parsed)
 }

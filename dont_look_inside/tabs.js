@@ -1,4 +1,4 @@
-function init_tabs() {
+export function init_tabs() {
     document.querySelectorAll('.tab-viewer').forEach((tab_view) => {
         console.log("tabviewer found!!!!!!!!!");
         tab_view.querySelectorAll(':scope > .tabs > div').forEach((btn, index) => {
@@ -7,7 +7,7 @@ function init_tabs() {
     })
 }
 
-function setTab(tab_view, index) {
+export function setTab(tab_view, index) {
     console.log('setTap executed');
     const tabs  = tab_view.querySelector(':scope > .tabs');
     const panes = tab_view.querySelector(':scope > .panes');

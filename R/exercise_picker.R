@@ -20,6 +20,7 @@ start_exercise_picker <- function(){
 
 
   ui <- miniUI::miniPage(
+    shinyjs::useShinyjs(),
     gadgetTitleBar("My Gadget"),
     miniContentPanel(
       tags$head(tags$style("
@@ -62,6 +63,7 @@ start_exercise_picker <- function(){
 
     update_exercises <- function(){
       serie_url <- input$series
+      print("exercise update")
       # print(serie_url)
       if(serie_url != "" && !is.null(serie_url)){
         exercises <- get_json(serie_url)
@@ -82,11 +84,31 @@ start_exercise_picker <- function(){
       }
     }
 
+    update_button_enabled <- function(){
+      print(input$exercise)
+      if(is.null(input$exercise)){
+        shinyjs::disable("done")
+        print("dissabled")
+      } else {
+        shinyjs::enable("done")
+        print("enabled")
+      }
+    }
+
+    shinyjs::disable("done")
+    observeEvent(input$exercise, {
+      update_button_enabled()
+    })
+
     observeEvent(input$course, {
       update_series()
       update_exercises()
+      update_button_enabled()
     })
-    observeEvent(input$series, update_exercises())
+    observeEvent(input$series, {
+      update_exercises()
+      update_button_enabled()
+    })
     observeEvent(input$done, stopApp(input$exercise))
   }
 

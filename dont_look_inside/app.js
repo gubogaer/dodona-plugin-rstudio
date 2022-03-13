@@ -1,14 +1,25 @@
+import {generate_loading_screen} from "./loading_screen.js";
+
+export function testje(){
+  console.log("ik werk!!");
+}
 /**
  * wrapper frunction to unwrap (single value) vectors from json
  * @param json
  * @returns json obj with unwrapped vectors
  */
-function dodona_lite(json){
-  console.log("json: ", json);
-  for(key of Object.keys(json)) {
+export function dodona_lite(json){
+  console.log("generated dodona lite -------------------")
+  console.log(`json: ${json}`);
+  for(const key in json) {
     json[key] = [json[key]];
   }
-  return generate_body(json)
+  return generate_body(json);
+}
+
+export function loading_screen(_){
+  console.log("generated loading_screen -------------------")
+  return generate_loading_screen();
 }
 
 
