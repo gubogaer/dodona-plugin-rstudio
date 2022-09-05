@@ -1,7 +1,27 @@
+a {
+    color: #FFC107
+}
+
+.body {
+    background: white;
+}
+
 iframe {
     width: 100%;
-    height: 100%;
+    height: calc(100% - 50px);
     display: block;
+}
+
+#description-title {
+    color: #6b6b6b;
+    background: #f9f9f9;
+    line-height: 35px;
+    font-weight: bold;
+    height: 35px;
+    font-size: 13px;
+    display: flex;
+    padding: 0 16px;
+    border-bottom: 1px solid rgb(192, 192, 192);
 }
 
 .tab-viewer{
@@ -40,16 +60,18 @@ iframe {
 }
 
 #exercise_tabs > .tabs{
-    background-color: #1976d2;
-    color: white;
-
+    font-weight: bold;
+    background: #f1f5f7;
+    color: rgb(102, 102, 102);
+    box-shadow: inset 0px -2px 0px 0px rgb(202, 202, 202);
 }
 #exercise_tabs > .tabs > .active{
-    box-shadow: inset 0px -5px 0px 0px #FFC107;
+    color: #1976d2;
+    box-shadow: inset 0px -5px 0px 0px #1976d2;
     transition: box-shadow 0.3s ease-out;
 }
 #exercise_tabs > .tabs > div:hover{
-    box-shadow: inset 0px -5px 0px 0px #FFC107;
+    box-shadow: inset 0px -5px 0px 0px #1976d2;
     transition: box-shadow 0.3s ease-out;
 }
 #exercise_tabs > .panes {
@@ -61,17 +83,33 @@ iframe {
 }
 
 .last-submission > .description{
+    display: block;
     margin-bottom: 6px;
 }
 
-.last-submission > .submission-status{
-    display: flex;
-    align-items: center;
-}
 
-.last-submission > .submission-status > .status-icon {
-    color: green;
-    font-size: 35px;
+.last-submission > .submission-status{
+    display: grid;
+    align-items: center;
+    grid-template-columns: min-content 1fr;
+    grid-template-rows: 1fr 1fr;
+    grid-template-areas:
+        "statusIcon statusText"
+        "statusIcon timeAgo"
+}
+.last-submission > .submission-status > span:nth-child(1){
+    grid-area: statusIcon;
+    font-size: 36px;
+    padding-right: 6px;
+}
+.last-submission > .submission-status > span:nth-child(2){
+    grid-area: statusText;
+    font-size: 14px;
+}
+.last-submission > .submission-status > span:nth-child(3){
+    grid-area: timeAgo;
+    font-size: 12px;
+    color:#6c757d
 }
 
 #feedback_tabs > .tabs{

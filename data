@@ -1,0 +1,30 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <link rel="stylesheet" href="./style.css">
+        <link rel="stylesheet" href="./lib/highlight_Vs.css">
+        <script src="./lib/highlight.min.js"></script>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" media="all" href="https://dodona.ugent.be/assets/application-7a8bece9578bc7a116704c6b0c16fc4b2e56c6b0dcb02faece8b98f3cb0629b8.css">
+    </head>
+    <body>
+        <script type="module">
+            import {dodona_lite} from "./app.js"
+            import {init_tabs, setTab} from "./tabs.js"
+            document.body.appendChild(dodona_lite({"type":["Exercise"],"submission":{"code":["fghfgh #https://dodona.ugent.be/nl/courses/705/series/8643/activities/1368083120\n\n\n\n"],"status":["compilation error"],"feedback":["<div class=\"tab-pane feedback-tab-pane active\" id=\"tab-eval-0\"><div class=\"groups\"><div class=\"group wrong\"><div class=\"messages\"><div class=\"message message-student\" title=\"\">Error while evaluating context: object 'fghfgh' not found<\/div><\/div><\/div><\/div><\/div>\n"]},"description":["<!DOCTYPE html>\n<html\n  prefix=\"og: http://ogp.me/ns#\"\n  lang=\"nl\"\n  class=\"dodona-frame\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  \n  <meta property=\"og:image\" content=\"https://dodona.ugent.be/icon.png\">\n  <link href=\"https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap\" rel=\"stylesheet\">\n  <link href=\"https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css\" rel=\"stylesheet\" type='text/css'>\n    <link rel=\"stylesheet\" href=\"https://dodona.ugent.be/assets/application-e69993cac5acc9d639dc48ed620e4ee9bb5dcc56b578eb1ef6609af4d5e1fd7f.css\" media=\"all\" />\n  <script src=\"https://dodona.ugent.be/assets/frame-142abf3dd0b174d35e64d2a713ea06a890ca10940c629eeded1f6051db5d6016.js\"><\/script>\n  <script src=\"https://dodona.ugent.be/assets/application_old-2e1a6810667f5ac63ecce1f1241c744b04de6e39ea6e4c8fd0ddd8f7669cba1c.js\"><\/script>\n    <script src=\"https://dodona.ugent.be/assets/description-5961bdd242c3ad64205c9a2ae7dfdd3fa4b4453066c17634ad8e9279661e7180.js\"><\/script>\n  <script>\n    window.dodona.initMathJax();\n  <\/script>\n  <script id=\"MathJax-script\" src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'><\/script>\n\n<\/head>\n<body>\n<base target=\"_parent\" href=\"https://sandbox.dodona.be/nl/activities/1368083120/description/_32TiRrjri5iHw3X/?dark=false\">\n  <div class=\"activity-description\">\n  <div class=\"card-supporting-text\">\n      <p>What is the sum of the first 100 positive integers? The formula for\nthe sum of integers \\(1\\) through \\(n\\) is \\(n(n+1)/2\\). Define\n\\(n=100\\) and then use R to compute the sum of \\(1\\) through \\(100\\)\nusing the formula. What is the sum?<\/p>\n\n<h3 id=\"example\">Example<\/h3>\n<p>With the code below you can compute the sum for the first 20 integers.\nYou can copy and past the code in the R console to evaluate that the code.<\/p>\n\n<pre><code>20*(20+1)/2\n<\/code><\/pre>\n\n<p>However, we can also define a variable n to re-use the formula for other values of n<\/p>\n\n<ul>\n  <li>We first define the variable n and set it equal to 20<\/li>\n  <li>Next we calculate the formula<\/li>\n<\/ul>\n\n<pre><code>n &lt;- 20\nn*(n+1)/2\n<\/code><\/pre>\n\n<p>We can reuse the same code and redefine n so to repeat the calculation for n=25.<\/p>\n\n<pre><code>n &lt;- 25\nn*(n+1)/2\n<\/code><\/pre>\n\n<h3 id=\"exercise\">Exercise<\/h3>\n<p>Now, adjust the code from the example to calculate the sum of the first 100 integers.<\/p>\n\n    <footer class=\"footnote-links visible-print\">\n    <\/footer>\n  <\/div>\n<\/div>\n<script>\n  $(() => window.dodona.initDescription());\n<\/script>\n\n<\/body>\n<\/html>\n"]}).content.cloneNode(true));
+
+            //init_tabs();
+            hljs.configure({languages: ["r"]});
+            hljs.initHighlightingOnLoad();
+
+            console.log(document.querySelector("#exercise_tabs"));
+            //setTab(document.querySelector("#exercise_tabs"), 0);
+            //setTab(document.querySelector("#feedback_tabs"), 0);
+        </script>
+    </body>
+    </html>

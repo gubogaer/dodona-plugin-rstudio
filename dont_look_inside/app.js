@@ -10,29 +10,41 @@ export function testje(){
  */
 export function dodona_lite(json){
   console.log("generated dodona lite -------------------")
-  console.log(`json: ${json}`);
-  for(const key in json) {
-    json[key] = [json[key]];
-  }
+  console.log(json);
+  // for(const key in json) {
+  //   json[key] = [json[key]];
+  // }
   return generate_body(json);
 }
 
-export function loading_screen(_){
-  console.log("generated loading_screen -------------------")
-  return generate_loading_screen();
-}
+// export function loading_screen(_){
+//   console.log("generated loading_screen -------------------")
+//   return generate_loading_screen();
+// }
 
 
+//description, feedback_content, feedback_names, code
+function generate_body({type, submission=null , exercise}) {
 
-function generate_body({description, feedback_content, feedback_names, code}) {
+    console.log(submission);
+
     const template = document.createElement("template");
 
-    const feedback_tables = feedback_content.reduce((acc, curr) => {
-      return acc + /*html*/`<div class='feedback-table'>${curr}</div>`;
-    }, "");
-    const feedback_tabs = feedback_names.reduce((acc, curr) => {
-      return acc + /*html*/`<div>${curr}</div>`;
-    }, "");
+
+    const feedback_tables = function(submission) {
+      console.log("feedback_tabs")
+      console.log(Object.values(submission.feedback));
+      return Object.values(submission.feedback).reduce((acc, curr) => {
+        return acc + /*html*/`<div class='feedback-table'>${curr}</div>`;
+      }, "");
+    }
+    const feedback_tabs = function(submission){
+      console.log("feedback_tabs")
+      console.log(Object.keys(submission.feedback));
+      return Object.keys(submission.feedback).reduce((acc, curr) => {
+        return acc + /*html*/`<div>${curr}</div>`;
+      }, "");
+    }
 
     console.log(feedback_tabs);
 
@@ -44,53 +56,112 @@ function generate_body({description, feedback_content, feedback_names, code}) {
     `<div id='exercise_tabs' class='tab-viewer'>
       <div class='tabs'>
         <div>Exercise</div>
-        <div>Last Submission</div>
+        ${submission === null ? "" : /*html*/`<div>Last Submission</div>`}
       </div>
       <div class='panes'>
         <div>
+          <div id="description-title">${exercise.name}</div>
           <iframe id="description"></iframe>
-
         </div>
-        <div class='last-submission'>
-          <span class='description'>Solution for   by  in   </span>
-          <div class='submission-status'>
-            <span class='material-icons status-icon'>done</span>
-            <span>Corect</span>
-          </div>
-
-          <div id='feedback_tabs' class='tab-viewer'>
-            <div class='tabs'>
-              ${feedback_tabs}
-              <div>Code</div>
+        ${submission === null ? "" :
+          /*html*/
+          `<div class='last-submission'>
+            <span class='description'>
+              Solution for <a href='${exercise.url}'>${exercise.name}</a> by <a href='${submission.user_url}'>you</a>
+            </span>
+            <div class='submission-status'>
+              ${status_icon_map[submission.status]}
+              <span>${capitalizeFirstLetter(submission.status)}</span>
+              <span>${timeSince(submission.created_at)}<span>
             </div>
-            <div class='panes'>
-              ${feedback_tables}
-              <div>
-                <pre class='r'><code>${code}</code></pre>
+
+            <div id='feedback_tabs' class='tab-viewer'>
+              <div class='tabs'>
+                ${feedback_tabs(submission)}
+                <div>Code</div>
+              </div>
+              <div class='panes'>
+                ${feedback_tables(submission)}
+                <div>
+                  <pre class='r'><code>${submission.code}</code></pre>
+                </div>
               </div>
             </div>
-          </div>
-
-        </div>
+          </div>`
+        }
       </div>
     </div>`
 
-    template.content.getElementById("description").setAttribute("srcDoc", description);
+    template.content.getElementById("description").setAttribute("srcDoc", exercise.description);
     return template;
+}
+
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+const status_icon_map = {
+  "compilation error": "<span class='material-icons' style='color:red; font-size:35px;'>bolt</span>",
+  "runtime error": "<span class='material-icons' style='color:red; font-size:35px;'>flash_on</span>",
+  "memory limit exceeded": "<span class='material-icons' style='color:red; font-size:35px;'>memory</span>",
+  "time limit exceeded": "<span class='material-icons' style='color:red; font-size:35px;'>alarm</span>",
+  "wrong": "<span class='material-icons' style='color:red; font-size:35px;'>close</span>",
+  "correct": "<span class='material-icons' style='color:green; font-size:35px;'>check</span>",
+  "queued": "",
+  "running": "",
+  "internal error": "<span class='material-icons' style='color:yellow; font-size:35px;'>warning</span>",
+  "unknown": ""
+}
+
+function timeSince(date) {
+  let seconds = Math.floor((new Date() - new Date(date)) / 1000);
+  let interval = seconds / 31536000;
+
+  if (interval > 1) {
+    let years = Math.floor(interval)
+    return `About ${years} ${years == 1 ? "year" : "years"} ago`;
+  }
+  interval = seconds / 2592000;
+  if (interval > 1) {
+    let months = Math.floor(interval)
+    return `About ${months} ${months == 1 ? "month" : "months"} ago`;
+  }
+  interval = seconds / 86400;
+  if (interval > 1) {
+    let days = Math.floor(interval)
+    return `About ${days} ${days == 1 ? "day" : "days"} ago`;
+  }
+  interval = seconds / 3600;
+  if (interval > 1) {
+    let hours = Math.floor(interval)
+    return `About ${hours} ${hours == 1 ? "hour" : "hours"} ago`;
+  }
+  interval = seconds / 60;
+  if (interval > 1) {
+    let minutes = Math.floor(interval)
+    return `About ${minutes} ${minutes == 1 ? "minute" : "minutes"} ago`;
+  }
+  interval = seconds / 10;
+  if (interval > 1) {
+    let seconds = Math.floor(interval) * 10
+    return `About ${seconds} seconds ago`;
+  }
+  return " Just now";
 }
 
 
 // get_status_icon <- function(status, classes){
-//   icon <- list(
-//     "compilation error" = c(icon, color, secondary),
-//     "runtime error" = c(icon, color, ""),
-//     "memory limit exceeded" = c(),
-//     "time limit exceeded" = c(),
-//     "wrong" = c(),
-//     "correct" = c(),
-//     "queued" = c(),
-//     "running" = c(),
-//     "internal error" = c(),
-//     "unknown" = c()
+//   list(
+//     "compilation error" = "<span class='material-icons' style='color:red; font-size:13px;'>bolt</span>",
+//     "runtime error" = "<span class='material-icons' style='color:red; font-size:13px;'>flash_on</span>",
+//     "memory limit exceeded" = "<span class='material-icons' style='color:red; font-size:13px;'>memory</span>",
+//     "time limit exceeded" = "<span class='material-icons' style='color:red; font-size:13px;'>alarm</span>",
+//     "wrong" = "<span class='material-icons' style='color:red; font-size:13px;'>close</span>",
+//     "correct" = "<span class='material-icons' style='color:green; font-size:13px;'>check</span>",
+//     "queued" = "",
+//     "running" = "",
+//     "internal error" = "<span class='material-icons' style='color:yellow; font-size:13px;'>warning</span>",
+//     "unknown" = ""
 //   )[[status]]
-//   }
+//
+// }

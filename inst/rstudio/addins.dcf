@@ -1,14 +1,14 @@
-Name: submit
+Name: submit / mark as read
 Description: open dodona plugin
 Binding: submit_exercise
-Interactive: false
+Interactive: true
 
-Name: test
-Description: test
-Binding: test
+Name: settings
+Description: Dodona settings page
+Binding: settings
 Interactive: true
 
 Name: exercise picker
 Description: open dodona plugin
 Binding: exercise_picker
-Interactive: false
+Interactive: true
