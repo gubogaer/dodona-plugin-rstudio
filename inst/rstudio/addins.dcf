@@ -3,6 +3,11 @@ Description: open dodona plugin
 Binding: submit_exercise
 Interactive: true
 
+Name: mark as read
+Description: mark the reading exercise as read
+Binding: mark_read
+Interactive: true
+
 Name: settings
 Description: Dodona settings page
 Binding: settings

@@ -62,6 +62,7 @@ load_reading_activity <- function(activity_url){
 
   list(
     type = unbox("ContentPage"),
+    has_read = unbox(contentPage$has_read),
     exercise = list(
       name = unbox(contentPage$name),
       url = unbox(contentPage$url),
@@ -73,11 +74,17 @@ load_reading_activity <- function(activity_url){
 load_exercise_activity <- function(exercise_url, submission_url = NULL){
   exercise <- get_json(exercise_url)
   tabFocus <- "Feedback"
+
+  if (Sys.getenv("dodona_user_id") == ""){
+    json <- get_json("https://dodona.ugent.be/nl/profile")
+    Sys.setenv(dodona_user_id = json$id)
+  }
   if (is.null(submission_url)){
     # find last submission TODO if there is one
     tabFocus <- "Description"
     submissions_url <- file.path(tools::file_path_sans_ext(exercise$url), "submissions")
     submissions <- get_json(submissions_url, query = list(user_id = Sys.getenv("dodona_user_id")))
+    print(submissions)
     submission_url <- submissions[["url"]][1]
   }
 
@@ -106,6 +113,7 @@ get_description <- function(url){
   tryCatch(
     {
       print("stap 2.0")
+      print(url)
       get_html(url)
     },
     error=function(cond){

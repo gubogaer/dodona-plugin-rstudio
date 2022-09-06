@@ -13,9 +13,9 @@ submit_reading_dialog <- function(exercise_url){
         stopApp()
     })
 
-    response <- read_activity(exercise_url)
+    read_activity(exercise_url)
     print("respoooooooonnnnnnnnsssssssseeeeeee")
-    print(response)
+
     #submission_json <<- wait_for_feedback(submission_url)
     stopApp()
 
@@ -26,11 +26,9 @@ submit_reading_dialog <- function(exercise_url){
 read_activity <- function(exercise_url){
     exercise_identification <- identify_exercise(exercise_url)
     body_obj <- list(
-        submission = list(
-            course_id=unbox(exercise_identification$course),
-            series_id=unbox(exercise_identification$series),
-            activity_id=unbox(exercise_identification$activity)
-        )
+        course_id=unbox(exercise_identification$course),
+        series_id=unbox(exercise_identification$series),
+        activity_id=unbox(exercise_identification$activity)
     )
     body = jsonlite::toJSON(body_obj)
     print(exercise_url)
@@ -45,18 +43,17 @@ read_activity <- function(exercise_url){
         ),
         body = body
     )
-    parsed <- jsonlite::fromJSON(httr::content(resp, type="text", encoding = "UTF-8"))
+    #parsed <- jsonlite::fromJSON(httr::content(resp, type="text", encoding = "UTF-8"))
     if (httr::status_code(resp) != 200) {
         stop(
             sprintf(
                 "API request failed [%s]\n%s\n<>",
-                httr::status_code(resp),
-                parsed
+                httr::status_code(resp)
             ),
             call. = FALSE
         )
     }
-    return(parsed)
+    return()
 }
 
 submit_dialog <- function(lines, exercise_url){

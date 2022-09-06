@@ -174,6 +174,11 @@ start_exercise_picker <- function(){
       print(activity_data)
       html <- generate_html(activity_data)
       refresh_viewer(html)
+      if(activity$type == "ContentPage"){
+        options("dodona_reading_url" = activity$url)
+      } else {
+        options("dodona_reading_url" = NULL)
+      }
       stopApp("lalal")
       ################################################
     })

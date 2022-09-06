@@ -93,15 +93,15 @@ refresh_viewer <- function(html){
 mark_read <- function(){
   tryCatch(
     {
-      code_lines <- get_submission_lines()
-      exercise_url <- get_exercise_url(code_lines)
+      exercise_url <- getOption("dodona_reading_url")
+      if(is.null(exercise_url)){
+        stop('your not even reding an exercise')
+      }
 
       serverUi <- submit_reading_dialog(exercise_url)
 
       viewer <- shiny::dialogViewer("Loading", width=400, height=100)
-      print(serverUi[2])
-      submission_url <- NULL
-      submission_url <- shiny::runGadget(
+      shiny::runGadget(
         shinyApp(
           serverUi[[1]],
           serverUi[[2]],
@@ -109,7 +109,7 @@ mark_read <- function(){
             cat("Doing application setup\n")
             onStop(function() {
               print("testje")
-              activity_data <- load_exercise_activity(exercise_url, submission_url)
+              activity_data <- load_reading_activity(exercise_url)
               print("na het testje testje")
               html <- generate_html(activity_data)
               refresh_viewer(html)
@@ -118,13 +118,12 @@ mark_read <- function(){
         ),
         viewer = viewer
       )
-
-
     },
     error=function(cond) {
       message(cond)
         print("window closedd")
-    }
+    },
+    finally= options()
   )
 }
 
@@ -159,6 +158,7 @@ submit_exercise <- function(){
               print("na het testje testje")
               html <- generate_html(activity_data)
               refresh_viewer(html)
+              options("dodona_reading_url" = NULL)
             })
           }
         ),

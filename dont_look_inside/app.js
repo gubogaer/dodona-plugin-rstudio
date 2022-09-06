@@ -24,7 +24,7 @@ export function dodona_lite(json){
 
 
 //description, feedback_content, feedback_names, code
-function generate_body({type, submission=null , exercise}) {
+function generate_body({type, submission=null, has_read=null, exercise}) {
 
     console.log(submission);
 
@@ -60,8 +60,19 @@ function generate_body({type, submission=null , exercise}) {
       </div>
       <div class='panes'>
         <div>
-          <div id="description-title">${exercise.name}</div>
+          <div id="description-title">
+            <div>${exercise.name}</div>
+            <div>
+              ${has_read === null ? "" :
+                (has_read
+                  ? /*html*/`gelezen`
+                  : /*html*/``
+                )
+              }
+            </div>
+          </div>
           <iframe id="description"></iframe>
+
         </div>
         ${submission === null ? "" :
           /*html*/
