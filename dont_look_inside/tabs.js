@@ -1,7 +1,7 @@
 export function init_tabs() {
     document.querySelectorAll('.tab-viewer').forEach((tab_view) => {
         console.log("tabviewer found!!!!!!!!!");
-        tab_view.querySelectorAll(':scope > .tabs > div').forEach((btn, index) => {
+        tab_view.querySelectorAll(':scope > .tabs > .tab_header').forEach((btn, index) => {
             btn.addEventListener('click', () => setTab(tab_view, index));
         })
     })
@@ -18,7 +18,7 @@ export function setTab(tab_view, index) {
     prev_active_tab.classList.remove('active');
     }
     console.log('step2');
-    tabs.children[index].classList.add('active');
+    tabs.querySelectorAll(':scope > .tab_header')[index].classList.add('active');
 
     console.log('step3');
     const prev_active_pane = panes.querySelector(':scope > .active');

@@ -42,7 +42,7 @@ function generate_body({type, submission=null, has_read=null, exercise}) {
       console.log("feedback_tabs")
       console.log(Object.keys(submission.feedback));
       return Object.keys(submission.feedback).reduce((acc, curr) => {
-        return acc + /*html*/`<div>${curr}</div>`;
+        return acc + /*html*/`<div class='tab_header'>${curr}</div>`;
       }, "");
     }
 
@@ -55,8 +55,9 @@ function generate_body({type, submission=null, has_read=null, exercise}) {
     template.innerHTML =/*html*/
     `<div id='exercise_tabs' class='tab-viewer'>
       <div class='tabs'>
-        <div>Exercise</div>
-        ${submission === null ? "" : /*html*/`<div>Last Submission</div>`}
+        <div><img src="logo_dodona_inverse.png" alt="Dodona Logo" class='logo'></div>
+        <div class='tab_header'>Exercise</div>
+        ${submission === null ? "" : /*html*/`<div class='tab_header'>Last Submission</div>`}
       </div>
       <div class='panes'>
         <div>
@@ -89,7 +90,7 @@ function generate_body({type, submission=null, has_read=null, exercise}) {
             <div id='feedback_tabs' class='tab-viewer'>
               <div class='tabs'>
                 ${feedback_tabs(submission)}
-                <div>Code</div>
+                <div class='tab_header'>Code</div>
               </div>
               <div class='panes'>
                 ${feedback_tables(submission)}

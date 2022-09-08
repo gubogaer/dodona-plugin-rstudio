@@ -34,18 +34,25 @@ iframe {
     grid-template-areas: "tabs" "panes";
 }
 
+
 .tabs {
     display: flex;
     justify-content: left;
     grid-area: tabs;
 }
 
+.logo {
+    height: 100%;
+    margin-right: 20px;
+}
 
 
-.tabs > div {
+
+.tabs > .tab_header {
     cursor: pointer;
     padding: 14px 16px;
     font-size: 17px;
+    line-height: 30px;
 }
 
 .panes {
@@ -68,13 +75,13 @@ iframe {
     color: rgb(102, 102, 102);
     box-shadow: inset 0px -2px 0px 0px rgb(202, 202, 202);
 }
-#exercise_tabs > .tabs > .active{
-    color: #1976d2;
-    box-shadow: inset 0px -5px 0px 0px #1976d2;
+#exercise_tabs > .tabs > .tab_header.active{
+    color: rgba(33, 150, 243);
+    box-shadow: inset 0px -5px 0px 0px rgba(33, 150, 243);
     transition: box-shadow 0.3s ease-out;
 }
-#exercise_tabs > .tabs > div:hover{
-    box-shadow: inset 0px -5px 0px 0px #1976d2;
+#exercise_tabs > .tabs > .tab_header:hover{
+    box-shadow: inset 0px -5px 0px 0px rgba(33, 150, 243);
     transition: box-shadow 0.3s ease-out;
 }
 #exercise_tabs > .panes {
