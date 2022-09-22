@@ -40,8 +40,8 @@ open_r_script <- function(exercise){
 
 refresh_viewer <- function(html){
   html_path <- file.path(getwd(), "dont_look_inside", "index.html")
-  out <- file(html_path, 'w')
-  write(html, file=out)
+  out <- file(html_path, 'wb')
+  writeBin(charToRaw(html), out, endian="little")
   close(out)
 
   # TODO use fixed port from settings file

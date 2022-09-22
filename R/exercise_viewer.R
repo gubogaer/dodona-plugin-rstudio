@@ -75,7 +75,7 @@ load_exercise_activity <- function(exercise_url, submission_url = NULL){
 get_description <- function(url){
   tryCatch(
     {
-      get_html(url)
+      return(get_html(url))
     },
     error=function(err){
       err$message <- paste("While fetching description", err, sep = " ")
