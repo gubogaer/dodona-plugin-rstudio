@@ -10,7 +10,6 @@ test_settings <- function(){
     )
   )
 
-
   server <- function(input, output, session) {
 
     observeEvent(input$cancel, {
@@ -22,9 +21,7 @@ test_settings <- function(){
       key <- trimws(input$text)
 
 
-      print(key)
       Sys.setenv(dodona_api_token = key)
-      print(Sys.getenv("dodona_api_token"))
 
       # test key + update user id
       tryCatch(

@@ -3,8 +3,6 @@ source("R/server_handler.R")
 
 start_exercise_picker <- function(){
 
-  # print("exercise picker started")
-
   courses <- get_home()$user$subscribed_courses
   courses <- lapply(courses %>% dplyr::select(year, name, series) %>% split(courses$year),
                     function(x){lapply(x %>% split(x$name), function(y){y$series})})
@@ -21,7 +19,7 @@ start_exercise_picker <- function(){
 
   ui <- miniUI::miniPage(
     shinyjs::useShinyjs(),
-    gadgetTitleBar("My Gadget"),
+    gadgetTitleBar("Exercise picker", left = miniTitleBarCancelButton(), right = miniTitleBarButton("done", "Open", primary = TRUE)),
     miniContentPanel(
       tags$head(tags$style("
                        .triple{
@@ -32,25 +30,22 @@ start_exercise_picker <- function(){
                        }"),
                 tags$link(href="https://fonts.googleapis.com/icon?family=Material+Icons", rel="stylesheet")),
 
-      pickerInput("course", "<b>Choose a course:</b>", courses),
-      pickerInput("series", "Choose a series:", list()),
-      pickerInput("exercise", "Choose an exercise:", list(), choicesOpt = list()),
+      pickerInput("course", "Choose a course:", courses, width="100%", options = pickerOptions(container = "body")),
+      pickerInput("series", "Choose a series:", list(), width="100%", options = pickerOptions(container = "body")),
+      pickerInput("exercise", "Choose an exercise:", list(), choicesOpt = list(), width="100%", options = pickerOptions(container = "body")),
     )
   )
 
   red_cross <- "<span class='material-icons' style='color:red; font-size:13px;'>close</span>"
-  green_check <- "<span class='material-icons' style='color:green; font-size:13px;'>lightning-bolt-circle</span>"
+  green_check <- "<span class='material-icons' style='color:green; font-size:13px;'>check</span>"
   #green_check <- "<span class='iconify' data-icon='mdi:lightning-bolt-circle' style='color:green; font-size:13px;'></span>"
 
   server <- function(input, output, session) {
 
     update_series <- function(){
       course_url <- input$course
-      # print(course_url)
       if(course_url != "" && !is.null(course_url)){
         series <- get_json(course_url)
-
-        print(series)
 
         series <- series %>% dplyr::select(name, exercises, order)
         # hacky way to make sure split doesn't change the order
@@ -60,8 +55,7 @@ start_exercise_picker <- function(){
 
         updatePickerInput(session, "series", choices = series)
 
-      } else {
-        print("course url is null")
+      } else { #course url is null
         updatePickerInput(session, "series",choices = list())
       }
     }
@@ -70,8 +64,6 @@ start_exercise_picker <- function(){
 
     update_exercises <- function(){
       serie_url <- input$series
-      print("exercise update")
-      # print(serie_url)
       if(serie_url != "" && !is.null(serie_url)){
         exercises <- get_json(serie_url)
         dropdown_options <- seq_len(nrow(exercises))
@@ -89,7 +81,7 @@ start_exercise_picker <- function(){
                 status_icon <- red_cross
               }
             }
-          } else if(exercises$type == "ContentPage"){
+          } else if(row$type == "ContentPage"){
             type_icon <- "<span class='material-icons' style='font-size:13px;'>menu_book</span>"
             if(row$has_read){
               status_icon <- green_check
@@ -99,24 +91,13 @@ start_exercise_picker <- function(){
         }
 
 
-
-
-
         accepted_before_deadline <- exercises[["accepted_before_deadline"]]
         accepted_before_deadline <- accepted_before_deadline + 1
         accepted_before_deadline[is.na(accepted_before_deadline)] <- 3
 
-        # print(accepted_before_deadline)
-        #exercises <- exercises %>% dplyr::select(name, url)
-
         exercises$id <- factor(exercises$id, levels=unique(exercises$id))
-        #exercises_by_id <- exercises %>% split(exercises$id)
         exercise_by_ids <<- exercises %>% split(exercises$id)
 
-        print("++++++++++++++++++++++++++++++")
-        print(exercises)
-        print("++++++++++++++++++++++++++++++")
-        #updatePickerInput(session, "exercise", choices = list(c("a", "gg"), c("b", "gg")))
         updatePickerInput(session, "exercise", choices = exercises$id, choicesOpt=list(content = dropdown_options))
       } else {
         updatePickerInput(session, "exercise", choices = list())
@@ -124,13 +105,10 @@ start_exercise_picker <- function(){
     }
 
     update_button_enabled <- function(){
-      print(input$exercise)
       if(is.null(input$exercise)){
         shinyjs::disable("done")
-        print("dissabled")
       } else {
         shinyjs::enable("done")
-        print("enabled")
       }
     }
 
@@ -149,29 +127,19 @@ start_exercise_picker <- function(){
     })
 
     observeEvent(input$done, {
-      print(exercise_by_ids)
-      # stopApp(exercise_by_ids[[input$exercise]])
-      ##################################################
       activity0 <- exercise_by_ids[[input$exercise]]
 
-      print(activity0)
-      print(activity0$url)
       activity <- get_json(activity0$url)
       activity_data <- NULL
 
-      print(activity)
       if(activity$type == "ContentPage"){
-        print("test1")
         activity_data <- load_reading_activity(activity$url)
-        print("test2")
       } else if (activity$type == "Exercise"){
         activity_data <- load_exercise_activity(activity$url)
         open_r_script(activity)
       } else {
         stop(sprintf("Activity type (%s) not recognised.", activity$type))
       }
-      print("/////////////////////////////////////////////////////")
-      print(activity_data)
       html <- generate_html(activity_data)
       refresh_viewer(html)
       if(activity$type == "ContentPage"){
@@ -179,20 +147,12 @@ start_exercise_picker <- function(){
       } else {
         options("dodona_reading_url" = NULL)
       }
-      stopApp("lalal")
-      ################################################
+      stopApp()
     })
   }
 
   return(c(ui, server))
-  #shiny::runGadget(ui, server, viewer = shiny::dialogViewer("lalalal"))
 }
-
-
-
-
-
-
 
 
 

@@ -24,11 +24,12 @@ export function dodona_lite(json){
 
 
 //description, feedback_content, feedback_names, code
-function generate_body({type, submission=null, has_read=null, exercise}) {
+function generate_body({type, submission=null, exercise}) {
 
     console.log(submission);
 
     const template = document.createElement("template");
+    //template.acceptCharset = "UTF-8";
 
 
     const feedback_tables = function(submission) {
@@ -56,50 +57,68 @@ function generate_body({type, submission=null, has_read=null, exercise}) {
     `<div id='exercise_tabs' class='tab-viewer'>
       <div class='tabs'>
         <div><img src="logo_dodona_inverse.png" alt="Dodona Logo" class='logo'></div>
-        <div class='tab_header'>Exercise</div>
-        ${submission === null ? "" : /*html*/`<div class='tab_header'>Last Submission</div>`}
+        <div class='tab_header'>${type === "ContentPage" ? "Reading Activity" : "Exercise"}</div>
+        ${type === "Exercise" ? /*html*/`<div class='tab_header'>Last Submission</div>` : ""}
       </div>
       <div class='panes'>
         <div>
           <div id="description-title">
             <div>${exercise.name}</div>
             <div>
-              ${has_read === null ? "" :
-                (has_read
-                  ? /*html*/`gelezen`
-                  : /*html*/``
-                )
+              ${exercise.completed
+                ? /*html*/`<span class='material-icons' style='color:green;'>check</span><span style='color:green;'>completed</span>`
+                : /*html*/``
               }
             </div>
           </div>
           <iframe id="description"></iframe>
-
         </div>
-        ${submission === null ? "" :
+        ${type === "Exercise" ?
           /*html*/
-          `<div class='last-submission'>
-            <span class='description'>
-              Solution for <a href='${exercise.url}'>${exercise.name}</a> by <a href='${submission.user_url}'>you</a>
-            </span>
-            <div class='submission-status'>
-              ${status_icon_map[submission.status]}
-              <span>${capitalizeFirstLetter(submission.status)}</span>
-              <span>${timeSince(submission.created_at)}<span>
-            </div>
-
-            <div id='feedback_tabs' class='tab-viewer'>
-              <div class='tabs'>
-                ${feedback_tabs(submission)}
-                <div class='tab_header'>Code</div>
+          `<div>
+            <div id="description-title">
+              <div>${exercise.name}</div>
+              <div>
+                ${exercise.completed
+                  ? /*html*/`<span class='material-icons' style='color:green;'>check</span><span style='color:green;'>completed</span>`
+                  : /*html*/``
+                }
               </div>
-              <div class='panes'>
-                ${feedback_tables(submission)}
-                <div>
-                  <pre class='r'><code>${submission.code}</code></pre>
+            </div>
+            ${submission !== null 
+              ? `<div class='last-submission'>
+                <!--<span class='description'>
+                  Solution for <a href='${exercise.url}'>${exercise.name}</a> by <a href='${submission.user_url}'>you</a>
+                </span>-->
+                <div class='submission-status'>
+                  ${status_icon_map[submission.status]}
+                  <span>${capitalizeFirstLetter(submission.status)}</span>
+                  <span>${timeSince(submission.created_at)}<span>
                 </div>
-              </div>
-            </div>
-          </div>`
+
+                <div id='feedback_tabs' class='tab-viewer'>
+                  <div class='tabs'>
+                    ${feedback_tabs(submission)}
+                    <div class='tab_header'>Code</div>
+                  </div>
+                  <div class='panes'>
+                    ${feedback_tables(submission)}
+                    <div>
+                      <pre class='r'><code>${submission.code}</code></pre>
+                    </div>
+                  </div>
+                </div>
+              </div>`
+              : `<span class='last-submission'>
+                <span class='description'>
+                  You have not yet submitted anything
+                </span>
+              </span>`
+            }
+
+            
+
+          </div>` : ""
         }
       </div>
     </div>`

@@ -1,28 +1,3 @@
-submit_reading_dialog <- function(exercise_url){
-  ui <- miniUI::miniPage(
-    miniContentPanel(
-      titlePanel("Submitting reading exercise ..."),
-      textOutput("text"),
-      actionButton("test", "test")
-    )
-  )
-
-  server <- function(input, output, session) {
-    observeEvent(input$test, {
-        print("testtttt")
-        stopApp()
-    })
-
-    read_activity(exercise_url)
-    print("respoooooooonnnnnnnnsssssssseeeeeee")
-
-    #submission_json <<- wait_for_feedback(submission_url)
-    stopApp()
-
-  }
-  return(c(ui, server))
-}
-
 read_activity <- function(exercise_url){
     exercise_identification <- identify_exercise(exercise_url)
     body_obj <- list(
@@ -31,79 +6,36 @@ read_activity <- function(exercise_url){
         activity_id=unbox(exercise_identification$activity)
     )
     body = jsonlite::toJSON(body_obj)
-    print(exercise_url)
-    print(body)
 
-    resp <- httr::POST(
-        paste0("https://dodona.ugent.be/nl/activities/", exercise_identification$activity, "/activity_read_states/"),
-        config = httr::add_headers(
-            'Authorization' = Sys.getenv("dodona_api_token"),
-            'content-type'= 'application/json',
-            'Accept' = 'application/json'
-        ),
-        body = body
-    )
-    #parsed <- jsonlite::fromJSON(httr::content(resp, type="text", encoding = "UTF-8"))
-    if (httr::status_code(resp) != 200) {
-        stop(
-            sprintf(
-                "API request failed [%s]\n%s\n<>",
-                httr::status_code(resp)
-            ),
-            call. = FALSE
+    post_json(paste0("https://dodona.ugent.be/nl/activities/", exercise_identification$activity, "/activity_read_states/"),body)
+}
+
+
+loading_dialog <- function(title, callback_function, width=400, height=100){
+    ui <- miniUI::miniPage(
+        miniContentPanel(
+            titlePanel(title),
         )
-    }
-    return()
-}
-
-submit_dialog <- function(lines, exercise_url){
-  ui <- miniUI::miniPage(
-    miniContentPanel(
-      titlePanel("Submitting ..."),
-      textOutput("text"),
-      actionButton("test", "test")
     )
-  )
 
-  server <- function(input, output, session) {
-    observeEvent(input$test, {
-        print("testtttt")
-        stopApp()
-    })
-
-    submission_url <- submit_code(lines, exercise_url)
-    submission_json <<- wait_for_feedback(submission_url)
-    stopApp()
-    #tryCatch(
-    #    {
-    #    },
-    #    error=function(cond) {
-    #        output$text <- renderText({
-    #            "something went wrong"
-    #            #print(cond)
-    #        })
-    #    }
-    #)
-    ##get_index_content(exercise_url, submission_json$url)
-    ##refresh_viewer()
-
+    server <- function(input, output, session) {
+        result <- callback_function()
+        stopApp(result)
     }
-    return(c(ui, server))
-}
 
-# get_submission_lines <- function(){
-#     exercise_path <- rstudioapi::getSourceEditorContext()$path
-#     if(is.null(exercise_path)){
-#         stop("no exercise opened")
-#     }
-#     con <- file(exercise_path,"r")
-#     if(!isOpen(con, rw="read")){
-#         stop(paste0("could not read file (", exercise_path, ")"))
-#     }
-#     lines <- readLines(con)
-#     close(con)
-#     return(lines)
-# }
+    shiny::runGadget(
+        shinyApp(
+            ui,
+            server,
+            onStart = function() {
+                onStop(function() {
+                    
+                })
+            }
+        ),
+        viewer = shiny::dialogViewer("Loading", width=width, height=height)
+    )
+}
 
 
 get_series <- function(url) as.integer(gsub("^.*https://.*/series/(\\d+).*$", "\\1", url))
@@ -129,8 +61,6 @@ submit_code <- function(code_lines, exercise_url){
         )
     )
     body = jsonlite::toJSON(body_obj)
-    print(exercise_url)
-    print(body)
 
     resp <- httr::POST(
         "https://dodona.ugent.be/nl/submissions.json",
@@ -157,7 +87,6 @@ submit_code <- function(code_lines, exercise_url){
 
 
 wait_for_feedback <- function(submission_url){
-    print(submission_url)
     delay_grow_rate <- 1.5
 
     waiting_time <- 0
