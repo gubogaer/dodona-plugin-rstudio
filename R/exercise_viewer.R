@@ -29,7 +29,7 @@ load_reading_activity <- function(activity_url){
     type = unbox("ContentPage"),
     exercise = list(
       name = unbox(contentPage$name),
-      url = unbox(contentPage$url),
+      url = unbox(tools::file_path_sans_ext(contentPage$url)),
       description = unbox(description),
       completed = unbox(contentPage$has_read)
     )
@@ -65,7 +65,7 @@ load_exercise_activity <- function(exercise_url, submission_url = NULL){
     submission = submission,
     exercise = list(
       name = unbox(exercise$name),
-      url = unbox(exercise$url),
+      url = unbox(tools::file_path_sans_ext(exercise$url)),
       description = unbox(description),
       completed = unbox(exercise$accepted)
     )

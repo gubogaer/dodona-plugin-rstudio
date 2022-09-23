@@ -10,18 +10,17 @@ start_exercise_picker <- function(){
   courses <- c("pick a course" = "", courses)
 
 
-  images <- c(
-    "<div class='tuple'><span class='material-icons' style='color:red; font-size:13px;'>close</span><div>%s</div></div>",
-    "<div class='tuple'><span class='material-icons' style='color:green; font-size:13px;'>done</span><div>%s</div></div>",
-    "<div class='tuple'><div></div><div>%s</div></div>"
-  )
-
-
   ui <- miniUI::miniPage(
     shinyjs::useShinyjs(),
     gadgetTitleBar("Exercise picker", left = miniTitleBarCancelButton(), right = miniTitleBarButton("done", "Open", primary = TRUE)),
     miniContentPanel(
       tags$head(tags$style("
+                       .double{
+                         display: grid;
+                         grid-template-columns: 1fr auto;
+                         grid-gap: 0 10px;
+                         align-items: center;
+                       }
                        .triple{
                           display: grid;
                           grid-template-columns: 15px 15px 1fr;
@@ -31,14 +30,10 @@ start_exercise_picker <- function(){
                 tags$link(href="https://fonts.googleapis.com/icon?family=Material+Icons", rel="stylesheet")),
 
       pickerInput("course", "Choose a course:", courses, width="100%", options = pickerOptions(container = "body")),
-      pickerInput("series", "Choose a series:", list(), width="100%", options = pickerOptions(container = "body")),
-      pickerInput("exercise", "Choose an exercise:", list(), choicesOpt = list(), width="100%", options = pickerOptions(container = "body")),
+      pickerInput("series", "Choose a series:", list("serie" = ""), width="100%", options = pickerOptions(container = "body")),
+      pickerInput("exercise", "Choose an exercise:", list("exercise" = ""), choicesOpt = list(), width="100%", options = pickerOptions(container = "body")),
     )
   )
-
-  red_cross <- "<span class='material-icons' style='color:red; font-size:13px;'>close</span>"
-  green_check <- "<span class='material-icons' style='color:green; font-size:13px;'>check</span>"
-  #green_check <- "<span class='iconify' data-icon='mdi:lightning-bolt-circle' style='color:green; font-size:13px;'></span>"
 
   server <- function(input, output, session) {
 
@@ -46,267 +41,88 @@ start_exercise_picker <- function(){
       course_url <- input$course
       if(course_url != "" && !is.null(course_url)){
         series <- get_json(course_url)
+        series <- series %>% dplyr::select(name, exercises, order, deadline)
 
-        series <- series %>% dplyr::select(name, exercises, order)
-        # hacky way to make sure split doesn't change the order
-        series$name <- factor(series$name, levels=unique(series$name))
-        series <- series %>% split(series$name)
-        series <- lapply(series, function(x){x$exercises})
+        deadlines <- strptime(series$deadline, "%FT%X")
+        formatted_deadlines <- format(deadlines, format="%d %B %Y %R")
+        
+        deadline_span <-case_when(
+          is.na(formatted_deadlines)  ~ "<span></span>",
+          deadlines < Sys.time() ~ sprintf("<span style='color: rgb(150, 150, 150); font-size:11px;'>%s</span>", formatted_deadlines), 
+          TRUE ~                   sprintf("<span style='font-size:11px;'>%s</span>", formatted_deadlines)
+        )
 
-        updatePickerInput(session, "series", choices = series)
-
+        dropdown_options <- sprintf("<div class='double'><span>%s</span>%s</div>", series$name, deadline_span)
+        updatePickerInput(session, "series", choices = series$exercises, choicesOpt=list(content = dropdown_options))
       } else { #course url is null
-        updatePickerInput(session, "series",choices = list())
+        updatePickerInput(session, "series", choices = list("serie" = ""))
       }
     }
-
-    exercise_by_ids <- list()
 
     update_exercises <- function(){
+      course_url <- input$course
       serie_url <- input$series
-      if(serie_url != "" && !is.null(serie_url)){
+      if((course_url != "" && !is.null(course_url)) && (serie_url != "" && !is.null(serie_url))){
         exercises <- get_json(serie_url)
-        dropdown_options <- seq_len(nrow(exercises))
-        for (i in seq_len(nrow(exercises))) {       # for-loop over rows
-          row <- exercises[i, ]
-          name <- row$name
-          status_icon <- "<span></span>"
-          type_icon <- "<span></span>"
-          if(row$type == "Exercise"){
-            type_icon <- "<span class='material-icons' style='font-size:13px;'>terminal</span>"
-            if(row$has_solution){
-              if(row$accepted_before_deadline){
-                status_icon <- green_check
-              } else {
-                status_icon <- red_cross
-              }
-            }
-          } else if(row$type == "ContentPage"){
-            type_icon <- "<span class='material-icons' style='font-size:13px;'>menu_book</span>"
-            if(row$has_read){
-              status_icon <- green_check
-            }
-          }
-          dropdown_options[i] <- sprintf("<div class='triple'>%s<div>%s</div><div>%s</div></div>", status_icon, type_icon, name)
-        }
+        print(exercises)
 
+        names <- exercises$name
 
-        accepted_before_deadline <- exercises[["accepted_before_deadline"]]
-        accepted_before_deadline <- accepted_before_deadline + 1
-        accepted_before_deadline[is.na(accepted_before_deadline)] <- 3
+        type_icons <-case_when(
+          exercises$type == "ContentPage"  ~ "<span class='material-icons' style='font-size:13px;'>menu_book</span>",
+          exercises$type == "Exercise"     ~ "<span class='material-icons' style='font-size:13px;'>terminal</span>",
+          TRUE ~ "<span></span>"
+        )
+        
+        attempted <- ifelse(exercises$type == "ContentPage", exercises$has_read, exercises$has_solution)
+        completed_before_deadline <- ifelse(exercises$type == "ContentPage", exercises$has_read, exercises$accepted_before_deadline)
+        deadline_expired <- FALSE
+        status_icons <- case_when(
+          !attempted & !deadline_expired ~ "<span></span>",
+          deadline_expired  & completed_before_deadline  ~ "<span class='material-icons' style='color:green; font-size:13px;'>alarm_on</span>",
+          deadline_expired  & !completed_before_deadline ~ "<span class='material-icons' style='color:red; font-size:13px;'>alarm_off</span>",
+          !deadline_expired & completed_before_deadline  ~ "<span class='material-icons' style='color:green; font-size:13px;'>check</span>",
+          !deadline_expired & !completed_before_deadline ~ "<span class='material-icons' style='color:red; font-size:13px;'>close</span>"
+        )
 
-        exercises$id <- factor(exercises$id, levels=unique(exercises$id))
-        exercise_by_ids <<- exercises %>% split(exercises$id)
-
-        updatePickerInput(session, "exercise", choices = exercises$id, choicesOpt=list(content = dropdown_options))
+        dropdown_options <- sprintf("<div class='triple'>%s<div>%s</div><div>%s</div></div>", status_icons, type_icons, names)
+        updatePickerInput(session, "exercise", choices = exercises$url, choicesOpt=list(content = dropdown_options))
       } else {
-        updatePickerInput(session, "exercise", choices = list())
+        updatePickerInput(session, "exercise", choices = list("exercise" = ""))
       }
     }
 
-    update_button_enabled <- function(){
-      if(is.null(input$exercise)){
+    
+    observeEvent(input$course, {
+      update_series()
+    })
+    observeEvent(input$series, {
+      update_exercises()
+    })
+    observeEvent(input$exercise, {
+      if(input$exercise == ""){
         shinyjs::disable("done")
       } else {
         shinyjs::enable("done")
       }
-    }
-
-    shinyjs::disable("done")
-    observeEvent(input$exercise, {
-      update_button_enabled()
-    })
-    observeEvent(input$course, {
-      update_series()
-      update_exercises()
-      update_button_enabled()
-    })
-    observeEvent(input$series, {
-      update_exercises()
-      update_button_enabled()
     })
 
     observeEvent(input$done, {
-      activity0 <- exercise_by_ids[[input$exercise]]
-
-      activity <- get_json(activity0$url)
-      activity_data <- NULL
-
+      activity <- get_json(input$exercise)
       if(activity$type == "ContentPage"){
         activity_data <- load_reading_activity(activity$url)
+        options("dodona_reading_url" = activity$url)
       } else if (activity$type == "Exercise"){
         activity_data <- load_exercise_activity(activity$url)
         open_r_script(activity)
+        options("dodona_reading_url" = NULL)
       } else {
         stop(sprintf("Activity type (%s) not recognised.", activity$type))
       }
-      html <- generate_html(activity_data)
-      refresh_viewer(html)
-      if(activity$type == "ContentPage"){
-        options("dodona_reading_url" = activity$url)
-      } else {
-        options("dodona_reading_url" = NULL)
-      }
+      refresh_viewer(generate_html(activity_data))
       stopApp()
     })
   }
 
   return(c(ui, server))
 }
-
-
-
-
-
-#courses <- get_home()$user$subscribed_courses
-#courses <- lapply(courses %>% dplyr::select(year, name, series) %>% split(courses$year),
-#                  function(x){lapply(x %>% split(x$name), function(y){y$series})})
-#courses <- courses[order(names(courses), decreasing=TRUE)]
-#courses <- c("pick a course" = "", courses)
-#
-#
-#images <- c(
-#  "<div class='tuple'><span class='material-icons' style='color:red; font-size:13px;'>close</span><div>%s</div></div>",
-#  "<div class='tuple'><span class='material-icons' style='color:green; font-size:13px;'>done</span><div>%s</div></div>",
-#  "<div class='tuple'><div></div><div>%s</div></div>"
-#)
-#
-#red_cross <- "<span class='material-icons' style='color:red; font-size:13px;'>close</span>"
-#green_check <- "<span class='material-icons' style='color:green; font-size:13px;'>lightning-bolt-circle</span>"
-##green_check <- "<span class='iconify' data-icon='mdi:lightning-bolt-circle' style='color:green; font-size:13px;'></span>"
-#
-#
-#
-#ui <- miniUI::miniPage(
-#  shinyjs::useShinyjs(),
-#  gadgetTitleBar("My Gadget"),
-#  miniContentPanel(
-#    tags$head(tags$style("
-#                      .triple{
-#                        display: grid;
-#                        grid-template-columns: 15px 15px 1fr;
-#                        grid-gap: 0 5px;
-#                        align-items: center;
-#                      }"),
-#              tags$link(href="https://fonts.googleapis.com/icon?family=Material+Icons", rel="stylesheet")),
-#
-#    pickerInput("course", "<b>Choose a course:</b>", courses),
-#    pickerInput("series", "Choose a series:", list()),
-#    pickerInput("exercise", "Choose an exercise:", list(), choicesOpt = list()),
-#  )
-#)
-#
-#
-#server <- function(input, output, session) {
-#
-#  update_series <- function(){
-#    course_url <- input$course
-#    # print(course_url)
-#    if(course_url != "" && !is.null(course_url)){
-#      series <- get_json(course_url)
-#
-#      print(series)
-#
-#      series <- series %>% dplyr::select(name, exercises, order)
-#      # hacky way to make sure split doesn't change the order
-#      series$name <- factor(series$name, levels=unique(series$name))
-#      series <- series %>% split(series$name)
-#      series <- lapply(series, function(x){x$exercises})
-#
-#      updatePickerInput(session, "series", choices = series)
-#
-#    } else {
-#      print("course url is null")
-#      updatePickerInput(session, "series",choices = list())
-#    }
-#  }
-#
-#  exercise_by_ids <- list()
-#
-#  update_exercises <- function(){
-#    serie_url <- input$series
-#    print("exercise update")
-#    # print(serie_url)
-#    if(serie_url != "" && !is.null(serie_url)){
-#      exercises <- get_json(serie_url)
-#      dropdown_options <- seq_len(nrow(exercises))
-#      for (i in seq_len(nrow(exercises))) {       # for-loop over rows
-#        row <- exercises[i, ]
-#        name <- row$name
-#        status_icon <- "<span></span>"
-#        type_icon <- "<span></span>"
-#        if(row$type == "Exercise"){
-#          type_icon <- "<span class='material-icons' style='font-size:13px;'>terminal</span>"
-#          if(row$has_solution){
-#            if(row$accepted_before_deadline){
-#              status_icon <- green_check
-#            } else {
-#              status_icon <- red_cross
-#            }
-#          }
-#        } else if(exercises$type == "ContentPage"){
-#          type_icon <- "<span class='material-icons' style='font-size:13px;'>menu_book</span>"
-#          if(row$has_read){
-#            status_icon <- green_check
-#          }
-#        }
-#        dropdown_options[i] <- sprintf("<div class='triple'>%s<div>%s</div><div>%s</div></div>", status_icon, type_icon, name)
-#      }
-#
-#
-#
-#
-#
-#      accepted_before_deadline <- exercises[["accepted_before_deadline"]]
-#      accepted_before_deadline <- accepted_before_deadline + 1
-#      accepted_before_deadline[is.na(accepted_before_deadline)] <- 3
-#
-#      # print(accepted_before_deadline)
-#      #exercises <- exercises %>% dplyr::select(name, url)
-#
-#      exercises$id <- factor(exercises$id, levels=unique(exercises$id))
-#      #exercises_by_id <- exercises %>% split(exercises$id)
-#      exercise_by_ids <<- exercises %>% split(exercises$id)
-#
-#      print("++++++++++++++++++++++++++++++")
-#      print(exercises)
-#      print("++++++++++++++++++++++++++++++")
-#      #updatePickerInput(session, "exercise", choices = list(c("a", "gg"), c("b", "gg")))
-#      updatePickerInput(session, "exercise", choices = exercises$id, choicesOpt=list(content = dropdown_options))
-#    } else {
-#      updatePickerInput(session, "exercise", choices = list())
-#    }
-#  }
-#
-#  update_button_enabled <- function(){
-#    print(input$exercise)
-#    if(is.null(input$exercise)){
-#      shinyjs::disable("done")
-#      print("dissabled")
-#    } else {
-#      shinyjs::enable("done")
-#      print("enabled")
-#    }
-#  }
-#
-#  shinyjs::disable("done")
-#  observeEvent(input$exercise, {
-#    update_button_enabled()
-#  })
-#  observeEvent(input$course, {
-#    update_series()
-#    update_exercises()
-#    update_button_enabled()
-#  })
-#  observeEvent(input$series, {
-#    update_exercises()
-#    update_button_enabled()
-#  })
-#
-#  observeEvent(input$done, {
-#    print(exercise_by_ids)
-#    stopApp(exercise_by_ids[[input$exercise]])
-#    #stopApp("lalal")
-#  })
-#}
-

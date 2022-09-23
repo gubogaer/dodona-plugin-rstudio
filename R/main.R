@@ -1,8 +1,4 @@
-#source("R/exercise_picker.R")
-#source("R/exercise_viewer.R")
-#source("R/submission_handler.R")
-#source("R/index_generator.R")
-#source("R/settings.R")
+#importFrom(rstudioapi, getActiveDocumentContext)
 
 settings <- function(){
   #TODO implement settings
@@ -21,20 +17,30 @@ exercise_picker <- function(){
       )
     },
     error=function(cond) {
-      error_popup(cond)
       message(cond)
     }
   )
 }
 
 open_r_script <- function(exercise){
-  filename <- paste0(gsub('^_|_$', '', gsub("[\\.]+", "_", make.names(exercise$name))), "(", exercise$id, ").R")
-  if(!file.exists(filename)){
-    fileConn<-file(filename)
+  exercise_identification <- identify_exercise(exercise$url)
+  filename <- paste0(gsub('^_|_$', '', gsub("[\\.]+", "_", make.names(exercise$name))), ".R")
+
+  dir <- file.path(
+    "exercises",
+    exercise_identification$course,
+    exercise_identification$series,
+    exercise_identification$activity
+  )
+  if (!dir.exists(dir)) dir.create(dir, recursive = TRUE)
+
+  path <- file.path(dir, filename)
+  if(!file.exists(path)){
+    fileConn<-file(path)
     writeLines(c(paste0("#", exercise$url), "", exercise$boilerplate), fileConn)
     close(fileConn)
   }
-  rstudioapi::navigateToFile(filename)
+  rstudioapi::navigateToFile(path)
 }
 
 
@@ -48,7 +54,7 @@ refresh_viewer <- function(html){
   capture.output({server <- servr::browse_last(open=FALSE)}, type = "message")
   if(is.null(server)){
     port <- servr::random_port()
-    servr::httd("./dont_look_inside", port = port)
+    capture.output({servr::httd("./dont_look_inside", port = port)}, type = "message")
     server <- paste0("http://localhost:", port)
   }
   print(paste("the used server :", server))
@@ -64,13 +70,15 @@ mark_read <- function(){
       }
       loading_dialog("Loading...", function(){
         read_activity(exercise_url)
-        activity_data <- load_exercise_activity(exercise_url)
+        activity_data <- load_reading_activity(exercise_url)
+        activity_data$exercise$completed <- unbox(TRUE)
         html <- generate_html(activity_data)
         refresh_viewer(html)
       })
     },
     error = function(err) {
-      message(err)
+      print("yayayay")
+      stop(err)
     },
     finally = options()
   )

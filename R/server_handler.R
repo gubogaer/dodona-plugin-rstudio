@@ -15,7 +15,6 @@ get_html <- function(url){
              'Accept' = 'text/html',
              'Authorization' = Sys.getenv("dodona_api_token")
            ))
-  print(resp)
   if (httr::http_error(resp)) {
     stop(
       sprintf(
@@ -25,7 +24,7 @@ get_html <- function(url){
       call. = FALSE
     )
   }
-  return(httr::content(resp, type="text"))# type="text", as = "text", encoding = "UTF-8"
+  return(httr::content(resp, type="text", encoding="UTF-8"))
 }
 
 get_json <- function(url, query = list()){
@@ -40,7 +39,7 @@ get_json <- function(url, query = list()){
   if (httr::http_error(resp)) {
     stop(
       sprintf(
-        "API GET request failed [%s]\n%s\n<>",
+        "API GET request failed [%s]\n<>",
         status_code(resp)
       ),
       call. = FALSE
@@ -64,11 +63,14 @@ post_json <- function(url, body){
      body = body
   )
 
+  if(status_code(resp) == 422){
+    stop("You have allready read this activity before", call. = FALSE)
+  }
   #parsed <- jsonlite::fromJSON(content(resp, type="text", encoding = "UTF-8"))
   if (httr::http_error(resp)) {
     stop(
       sprintf(
-        "API POST request failed [%s]\n%s\n<>",
+        "API POST request failed [%s]\n<>",
         status_code(resp)
       ),
       call. = FALSE

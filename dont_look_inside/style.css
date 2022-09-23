@@ -1,6 +1,4 @@
-a {
-    color: #FFC107
-}
+
 
 .body {
     background: white;
@@ -29,6 +27,10 @@ iframe {
     font-size: 13px;
     padding: 0 16px;
 }
+#description-title > div > a {
+    color: #6b6b6b;
+}
+
 
 .tab-viewer{
     height: 100%;
@@ -47,7 +49,6 @@ iframe {
 
 .logo {
     height: 100%;
-    margin-right: 20px;
 }
 
 

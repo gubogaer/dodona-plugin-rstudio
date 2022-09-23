@@ -56,14 +56,18 @@ function generate_body({type, submission=null, exercise}) {
     template.innerHTML =/*html*/
     `<div id='exercise_tabs' class='tab-viewer'>
       <div class='tabs'>
-        <div><img src="logo_dodona_inverse.png" alt="Dodona Logo" class='logo'></div>
+        <div>
+          <a href="https://dodona.ugent.be/">
+            <img src="logo_dodona_inverse.png" alt="Dodona Logo" class='logo'>
+          </a>
+        </div>
         <div class='tab_header'>${type === "ContentPage" ? "Reading Activity" : "Exercise"}</div>
         ${type === "Exercise" ? /*html*/`<div class='tab_header'>Last Submission</div>` : ""}
       </div>
       <div class='panes'>
         <div>
           <div id="description-title">
-            <div>${exercise.name}</div>
+            <div><a href="${exercise.url}">${exercise.name}</a></div>
             <div>
               ${exercise.completed
                 ? /*html*/`<span class='material-icons' style='color:green;'>check</span><span style='color:green;'>completed</span>`
@@ -138,10 +142,10 @@ const status_icon_map = {
   "time limit exceeded": "<span class='material-icons' style='color:red; font-size:35px;'>alarm</span>",
   "wrong": "<span class='material-icons' style='color:red; font-size:35px;'>close</span>",
   "correct": "<span class='material-icons' style='color:green; font-size:35px;'>check</span>",
-  "queued": "",
-  "running": "",
+  "queued": "<span class='material-icons' style='color:gray; font-size:35px;'>hourglass_empty</span>",
+  "running": "<span class='material-icons' style='color:gray; font-size:35px;'>hourglass_empty</span>",
   "internal error": "<span class='material-icons' style='color:yellow; font-size:35px;'>warning</span>",
-  "unknown": ""
+  "unknown": "<span class='material-icons' style='color:gray; font-size:35px;'>question_mark</span>"
 }
 
 function timeSince(date) {

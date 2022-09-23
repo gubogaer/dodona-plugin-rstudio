@@ -12,29 +12,19 @@ read_activity <- function(exercise_url){
 
 
 loading_dialog <- function(title, callback_function, width=400, height=100){
-    ui <- miniUI::miniPage(
-        miniContentPanel(
-            titlePanel(title),
-        )
-    )
-
+    ui <- miniUI::miniPage(miniContentPanel(titlePanel(title)))
     server <- function(input, output, session) {
-        result <- callback_function()
-        stopApp(result)
+        tryCatch({
+            result <- callback_function()
+            stopApp(result)
+        },
+        error=function(err){
+            message(err$message)
+            stopApp()
+        })
     }
 
-    shiny::runGadget(
-        shinyApp(
-            ui,
-            server,
-            onStart = function() {
-                onStop(function() {
-                    
-                })
-            }
-        ),
-        viewer = shiny::dialogViewer("Loading", width=width, height=height)
-    )
+    shiny::runGadget(shinyApp(ui,server), viewer = shiny::dialogViewer("Dodona lite", width=width, height=height))
 }
 
 
